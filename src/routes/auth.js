@@ -7,7 +7,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
-const db = require('../db/usersDb');
 
 const router = express.Router();
 
@@ -20,12 +19,6 @@ const loginLimiter = rateLimit({
   message: { error: 'Demasiados intentos de inicio de sesion. Intente de nuevo en unos minutos.' },
 });
 
-function logAttempt(cedula, success, ip) {
-  db.prepare(
-    'INSERT INTO login_attempts (cedula, success, ip) VALUES (?, ?, ?)'
-  ).run(cedula, success ? 1 : 0, ip || null);
-}
-
 router.post('/login', loginLimiter, (req, res) => {
   const { cedula } = req.body || {};
 
@@ -35,7 +28,9 @@ router.post('/login', loginLimiter, (req, res) => {
 
   const cedulaLimpia = String(cedula).trim();
 
-  logAttempt(cedulaLimpia, true, req.ip);
+  if (!process.env.JWT_SECRET) {
+    return res.status(500).json({ error: 'JWT_SECRET no esta configurado en el servidor.' });
+  }
 
   const token = jwt.sign(
     {
