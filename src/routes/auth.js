@@ -1,12 +1,10 @@
 // routes/auth.js
 // -----------------------------------------------------------------------
-// Login de clientes externos. El "usuario" es la cedula y la
-// "contrasena" se valida contra el hash guardado en nuestra base
-// propia (app_users.db), NUNCA contra Open Orange.
+// Login de clientes externos. El "usuario" es la cedula y se valida
+// contra nuestra base propia (app_users.db), NUNCA contra Open Orange.
 // -----------------------------------------------------------------------
 
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const db = require('../db/usersDb');
@@ -29,10 +27,10 @@ function logAttempt(cedula, success, ip) {
 }
 
 router.post('/login', loginLimiter, (req, res) => {
-  const { cedula, password } = req.body || {};
+  const { cedula } = req.body || {};
 
-  if (!cedula || !password) {
-    return res.status(400).json({ error: 'Debe indicar cedula y contrasena.' });
+  if (!cedula) {
+    return res.status(400).json({ error: 'Debe indicar cedula.' });
   }
 
   const cedulaLimpia = String(cedula).trim();
@@ -43,14 +41,7 @@ router.post('/login', loginLimiter, (req, res) => {
 
   if (!user) {
     logAttempt(cedulaLimpia, false, req.ip);
-    return res.status(401).json({ error: 'Cedula o contrasena incorrecta.' });
-  }
-
-  const passwordOk = bcrypt.compareSync(password, user.password_hash);
-
-  if (!passwordOk) {
-    logAttempt(cedulaLimpia, false, req.ip);
-    return res.status(401).json({ error: 'Cedula o contrasena incorrecta.' });
+    return res.status(401).json({ error: 'Cedula no habilitada.' });
   }
 
   logAttempt(cedulaLimpia, true, req.ip);
@@ -72,40 +63,9 @@ router.post('/login', loginLimiter, (req, res) => {
       cedula: user.cedula,
       nombre: user.nombre,
       custCode: user.cust_code,
-      mustChangePassword: !!user.must_change_password,
+      mustChangePassword: false,
     },
   });
-});
-
-// Cambio de contrasena (requiere estar logueado).
-const { requireAuth } = require('../middleware/auth');
-
-router.post('/cambiar-password', requireAuth, (req, res) => {
-  const { passwordActual, passwordNueva } = req.body || {};
-
-  if (!passwordActual || !passwordNueva) {
-    return res.status(400).json({ error: 'Debe indicar la contrasena actual y la nueva.' });
-  }
-  if (passwordNueva.length < 6) {
-    return res.status(400).json({ error: 'La nueva contrasena debe tener al menos 6 caracteres.' });
-  }
-
-  const user = db.prepare('SELECT * FROM app_users WHERE id = ?').get(req.user.id);
-  if (!user) {
-    return res.status(404).json({ error: 'Usuario no encontrado.' });
-  }
-
-  const ok = bcrypt.compareSync(passwordActual, user.password_hash);
-  if (!ok) {
-    return res.status(401).json({ error: 'La contrasena actual no es correcta.' });
-  }
-
-  const nuevoHash = bcrypt.hashSync(passwordNueva, 10);
-  db.prepare(
-    "UPDATE app_users SET password_hash = ?, must_change_password = 0, updated_at = datetime('now') WHERE id = ?"
-  ).run(nuevoHash, user.id);
-
-  return res.json({ ok: true, mensaje: 'Contrasena actualizada correctamente.' });
 });
 
 module.exports = router;

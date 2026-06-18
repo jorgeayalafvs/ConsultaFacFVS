@@ -30,7 +30,7 @@ body {
 
 .oculto { display: none !important; }
 
-/* ---------- Pantallas de login / cambio de password ---------- */
+/* ---------- Pantalla de login ---------- */
 
 .pantalla {
   min-height: 100vh;
@@ -93,16 +93,14 @@ button {
   font-weight: 600;
 }
 
-#formLogin button,
-#formCambioPassword button {
+#formLogin button {
   width: 100%;
   margin-top: 24px;
   padding: 12px;
   background: var(--color-acento);
   color: white;
 }
-#formLogin button:hover,
-#formCambioPassword button:hover {
+#formLogin button:hover {
   background: var(--color-acento-hover);
 }
 

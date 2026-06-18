@@ -14,14 +14,10 @@ let paginaActual = 1;
 
 // ---------- Referencias a elementos ----------
 const pantallaLogin = document.getElementById('pantallaLogin');
-const pantallaCambioPassword = document.getElementById('pantallaCambioPassword');
 const pantallaPrincipal = document.getElementById('pantallaPrincipal');
 
 const formLogin = document.getElementById('formLogin');
 const errorLogin = document.getElementById('errorLogin');
-
-const formCambioPassword = document.getElementById('formCambioPassword');
-const errorCambioPassword = document.getElementById('errorCambioPassword');
 
 const nombreUsuarioEl = document.getElementById('nombreUsuario');
 const btnSalir = document.getElementById('btnSalir');
@@ -48,7 +44,7 @@ const cuerpoTablaDetalle = document.getElementById('cuerpoTablaDetalle');
 // ---------- Utilidades ----------
 
 function mostrarPantalla(pantalla) {
-  [pantallaLogin, pantallaCambioPassword, pantallaPrincipal].forEach((p) => p.classList.add('oculto'));
+  [pantallaLogin, pantallaPrincipal].forEach((p) => p.classList.add('oculto'));
   pantalla.classList.remove('oculto');
 }
 
@@ -94,48 +90,20 @@ formLogin.addEventListener('submit', async (e) => {
   errorLogin.classList.remove('visible');
 
   const cedula = document.getElementById('cedula').value.trim();
-  const password = document.getElementById('password').value;
-
   try {
     const datos = await llamarApi('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ cedula, password }),
+      body: JSON.stringify({ cedula }),
     });
 
     tokenSesion = datos.token;
     usuarioActual = datos.user;
     localStorage.setItem('token', tokenSesion);
 
-    if (usuarioActual.mustChangePassword) {
-      mostrarPantalla(pantallaCambioPassword);
-    } else {
-      iniciarPantallaPrincipal();
-    }
+    iniciarPantallaPrincipal();
   } catch (err) {
     errorLogin.textContent = err.message;
     errorLogin.classList.add('visible');
-  }
-});
-
-// ---------- Cambio de contraseña obligatorio ----------
-
-formCambioPassword.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  errorCambioPassword.classList.remove('visible');
-
-  const passwordActual = document.getElementById('passActual').value;
-  const passwordNueva = document.getElementById('passNueva').value;
-
-  try {
-    await llamarApi('/auth/cambiar-password', {
-      method: 'POST',
-      body: JSON.stringify({ passwordActual, passwordNueva }),
-    });
-    usuarioActual.mustChangePassword = false;
-    iniciarPantallaPrincipal();
-  } catch (err) {
-    errorCambioPassword.textContent = err.message;
-    errorCambioPassword.classList.add('visible');
   }
 });
 
