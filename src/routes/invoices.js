@@ -33,6 +33,26 @@ function parseFecha(valor, nombreCampo) {
   return valor; // YYYY-MM-DD, mysql2 lo interpreta bien como parametro
 }
 
+function texto(valor) {
+  if (valor === null || valor === undefined) return '';
+  return String(valor);
+}
+
+function numero(valor) {
+  if (valor === null || valor === undefined || valor === '') return 0;
+  return Number(valor);
+}
+
+function fechaJson(valor) {
+  if (!valor) return '';
+  if (valor instanceof Date) return valor.toISOString().slice(0, 10);
+  return String(valor).slice(0, 10);
+}
+
+function detalleError(err) {
+  return err?.sqlMessage || err?.message || err?.code || 'sin detalle tecnico';
+}
+
 // GET /api/facturas?fechaDesde=2026-01-01&fechaHasta=2026-06-18&pagina=1
 router.get('/facturas', requireAuth, async (req, res) => {
   try {
@@ -63,48 +83,41 @@ router.get('/facturas', requireAuth, async (req, res) => {
       WHERE I.CustCode = ?
         AND I.TransDate BETWEEN ? AND ?
       ORDER BY I.TransDate DESC, I.SerNr DESC
-      LIMIT ? OFFSET ?
-    `;
-
-    const sqlCount = `
-      SELECT COUNT(*) AS total
-      FROM Invoice I
-      WHERE I.CustCode = ?
-        AND I.TransDate BETWEEN ? AND ?
+      LIMIT ${porPagina} OFFSET ${offset}
     `;
 
     const [filas] = await pool.query(sql, [
-      custCode, fechaDesde, fechaHasta, porPagina, offset,
-    ]);
-    const [[{ total: totalRegistros }]] = await pool.query(sqlCount, [
       custCode, fechaDesde, fechaHasta,
     ]);
 
     const resultado = filas.map((f) => ({
-      numero: f.numero,
+      numero: texto(f.numero),
       tipo: TIPO_INVOICE[f.tipoCodigo] || 'FAC',
       numeroTimbrado: null,
-      fecha: f.fecha,
+      fecha: fechaJson(f.fecha),
       hora: '',
-      codigoCliente: f.codigoCliente,
+      codigoCliente: texto(f.codigoCliente),
       ruc: '',
-      nombreCliente: f.nombreCliente,
-      subTotal: f.subTotal,
-      total: f.total,
+      nombreCliente: texto(f.nombreCliente),
+      subTotal: numero(f.subTotal),
+      total: numero(f.total),
       vendedor: '',
       sucursal: '',
     }));
 
+    const haySiguientePagina = resultado.length === porPagina;
+    const totalRegistrosEstimado = offset + resultado.length + (haySiguientePagina ? 1 : 0);
+
     return res.json({
       pagina,
       porPagina,
-      totalRegistros,
-      totalPaginas: Math.ceil(totalRegistros / porPagina),
+      totalRegistros: totalRegistrosEstimado,
+      totalPaginas: haySiguientePagina ? pagina + 1 : pagina,
       facturas: resultado,
     });
   } catch (err) {
-    console.error('Error en /api/facturas:', err.message);
-    const detalle = process.env.SHOW_SQL_ERRORS === '1' ? ` Detalle: ${err.message}` : '';
+    console.error('Error en /api/facturas:', detalleError(err));
+    const detalle = process.env.SHOW_SQL_ERRORS === '1' ? ` Detalle: ${detalleError(err)}` : '';
     return res.status(500).json({ error: `Error al consultar las facturas. Intente nuevamente.${detalle}` });
   }
 });
@@ -145,8 +158,8 @@ router.get('/facturas/:numero/detalle', requireAuth, async (req, res) => {
 
     return res.json({ numero, items });
   } catch (err) {
-    console.error('Error en /api/facturas/:numero/detalle:', err.message);
-    const detalle = process.env.SHOW_SQL_ERRORS === '1' ? ` Detalle: ${err.message}` : '';
+    console.error('Error en /api/facturas/:numero/detalle:', detalleError(err));
+    const detalle = process.env.SHOW_SQL_ERRORS === '1' ? ` Detalle: ${detalleError(err)}` : '';
     return res.status(500).json({ error: `Error al consultar el detalle de la factura.${detalle}` });
   }
 });
