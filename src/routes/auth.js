@@ -1,7 +1,7 @@
 // routes/auth.js
 // -----------------------------------------------------------------------
-// Login de clientes externos. El "usuario" es la cedula y se valida
-// contra nuestra base propia (app_users.db), NUNCA contra Open Orange.
+// Login de clientes externos. Como la cedula y el CustCode son iguales,
+// se usa la cedula ingresada como custCode para filtrar facturas.
 // -----------------------------------------------------------------------
 
 const express = require('express');
@@ -35,23 +35,14 @@ router.post('/login', loginLimiter, (req, res) => {
 
   const cedulaLimpia = String(cedula).trim();
 
-  const user = db
-    .prepare('SELECT * FROM app_users WHERE cedula = ? AND activo = 1')
-    .get(cedulaLimpia);
-
-  if (!user) {
-    logAttempt(cedulaLimpia, false, req.ip);
-    return res.status(401).json({ error: 'Cedula no habilitada.' });
-  }
-
   logAttempt(cedulaLimpia, true, req.ip);
 
   const token = jwt.sign(
     {
-      id: user.id,
-      cedula: user.cedula,
-      custCode: user.cust_code,
-      nombre: user.nombre,
+      id: cedulaLimpia,
+      cedula: cedulaLimpia,
+      custCode: cedulaLimpia,
+      nombre: null,
     },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
@@ -60,9 +51,9 @@ router.post('/login', loginLimiter, (req, res) => {
   return res.json({
     token,
     user: {
-      cedula: user.cedula,
-      nombre: user.nombre,
-      custCode: user.cust_code,
+      cedula: cedulaLimpia,
+      nombre: null,
+      custCode: cedulaLimpia,
       mustChangePassword: false,
     },
   });
