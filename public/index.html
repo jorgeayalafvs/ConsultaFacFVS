@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Consulta de Facturas</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============ PANTALLA DE LOGIN ============ -->
+  <section id="pantallaLogin" class="pantalla">
+    <div class="tarjeta-login">
+      <h1 class="marca">Consulta de Facturas</h1>
+      <p class="subtitulo">Ingrese con su número de cédula</p>
+
+      <form id="formLogin" autocomplete="off">
+        <label for="cedula">Cédula</label>
+        <input type="text" id="cedula" inputmode="numeric" placeholder="Ej: 4123456" required />
+
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" required />
+
+        <button type="submit" id="btnLogin">Ingresar</button>
+        <p class="mensaje-error" id="errorLogin"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA DE CAMBIO DE CONTRASEÑA OBLIGATORIO ============ -->
+  <section id="pantallaCambioPassword" class="pantalla oculto">
+    <div class="tarjeta-login">
+      <h1 class="marca">Cambiar contraseña</h1>
+      <p class="subtitulo">Por seguridad, debe establecer una nueva contraseña antes de continuar.</p>
+      <form id="formCambioPassword" autocomplete="off">
+        <label for="passActual">Contraseña actual</label>
+        <input type="password" id="passActual" required />
+        <label for="passNueva">Contraseña nueva</label>
+        <input type="password" id="passNueva" minlength="6" required />
+        <button type="submit">Guardar contraseña</button>
+        <p class="mensaje-error" id="errorCambioPassword"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA PRINCIPAL ============ -->
+  <section id="pantallaPrincipal" class="pantalla oculto">
+    <header class="encabezado">
+      <div>
+        <span class="marca-chica">Consulta de Facturas</span>
+        <span class="nombre-usuario" id="nombreUsuario"></span>
+      </div>
+      <button id="btnSalir" class="boton-secundario">Salir</button>
+    </header>
+
+    <div class="contenedor">
+      <form id="formFiltros" class="panel-filtros">
+        <div class="campo">
+          <label for="fechaDesde">Desde</label>
+          <input type="date" id="fechaDesde" required />
+        </div>
+        <div class="campo">
+          <label for="fechaHasta">Hasta</label>
+          <input type="date" id="fechaHasta" required />
+        </div>
+        <button type="submit" id="btnBuscar">Buscar</button>
+      </form>
+
+      <p class="mensaje-error" id="errorBusqueda"></p>
+      <p class="mensaje-info oculto" id="cargando">Buscando facturas…</p>
+      <p class="mensaje-info oculto" id="sinResultados">No se encontraron facturas para el período seleccionado.</p>
+
+      <div class="tabla-envoltorio oculto" id="envoltorioTabla">
+        <table class="tabla-facturas">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Número</th>
+              <th>Tipo</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Cód. Cliente</th>
+              <th>RUC</th>
+              <th>Nombre</th>
+              <th class="num">Sub-Total</th>
+              <th class="num">Total</th>
+              <th>Vendedor</th>
+              <th>Sucursal</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla"></tbody>
+        </table>
+      </div>
+
+      <div class="paginador oculto" id="paginador">
+        <button id="btnAnterior" class="boton-secundario">‹ Anterior</button>
+        <span id="textoPagina"></span>
+        <button id="btnSiguiente" class="boton-secundario">Siguiente ›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODAL DE DETALLE DE FACTURA ============ -->
+  <div id="modalDetalle" class="modal oculto">
+    <div class="modal-contenido">
+      <button id="btnCerrarModal" class="boton-cerrar" aria-label="Cerrar">×</button>
+      <h2>Detalle de Factura <span id="numeroFacturaModal"></span></h2>
+      <table class="tabla-detalle">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th class="num">Cantidad</th>
+            <th class="num">Precio</th>
+            <th class="num">Descuento</th>
+            <th class="num">Sub-Total</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpoTablaDetalle"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script src="app.js"></script>
+</body>
+</html>

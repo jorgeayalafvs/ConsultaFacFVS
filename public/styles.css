@@ -1,0 +1,311 @@
+/* ============================================================
+   Paleta y tipografía
+   - Fondo: gris azulado muy claro, transmite "panel administrativo"
+   - Acento: azul petróleo (#2E5266), sobrio, asociado a confianza
+   - Tipografía: system-ui para máxima compatibilidad y carga rápida
+============================================================ */
+
+:root {
+  --color-fondo: #f4f6f8;
+  --color-superficie: #ffffff;
+  --color-texto: #1f2933;
+  --color-texto-suave: #5a6672;
+  --color-borde: #dfe4e8;
+  --color-acento: #2e5266;
+  --color-acento-hover: #234052;
+  --color-error: #b3261e;
+  --color-error-fondo: #fdecea;
+  --radio: 6px;
+  --sombra: 0 1px 3px rgba(15, 23, 31, 0.08), 0 1px 2px rgba(15, 23, 31, 0.06);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+.oculto { display: none !important; }
+
+/* ---------- Pantallas de login / cambio de password ---------- */
+
+.pantalla {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.tarjeta-login {
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.marca {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-acento);
+  margin: 0 0 4px;
+}
+
+.subtitulo {
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+  margin: 0 0 24px;
+}
+
+form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 16px 0 6px;
+  color: var(--color-texto);
+}
+
+form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  font-size: 1rem;
+  background: var(--color-fondo);
+}
+
+form input:focus {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 1px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radio);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+#formLogin button,
+#formCambioPassword button {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px;
+  background: var(--color-acento);
+  color: white;
+}
+#formLogin button:hover,
+#formCambioPassword button:hover {
+  background: var(--color-acento-hover);
+}
+
+.mensaje-error {
+  color: var(--color-error);
+  background: var(--color-error-fondo);
+  border-radius: var(--radio);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  margin-top: 14px;
+  display: none;
+}
+.mensaje-error.visible { display: block; }
+
+.mensaje-info {
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+  padding: 16px 0;
+}
+
+/* ---------- Pantalla principal ---------- */
+
+.encabezado {
+  background: var(--color-superficie);
+  border-bottom: 1px solid var(--color-borde);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.marca-chica {
+  font-weight: 700;
+  color: var(--color-acento);
+  margin-right: 16px;
+}
+
+.nombre-usuario {
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+}
+
+.boton-secundario {
+  background: transparent;
+  border: 1px solid var(--color-borde);
+  color: var(--color-texto);
+  padding: 8px 14px;
+}
+.boton-secundario:hover {
+  border-color: var(--color-acento);
+  color: var(--color-acento);
+}
+
+.contenedor {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+
+.panel-filtros {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.campo label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--color-texto-suave);
+}
+
+.campo input {
+  padding: 9px 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  font-size: 0.95rem;
+}
+
+.panel-filtros button {
+  background: var(--color-acento);
+  color: white;
+  padding: 10px 20px;
+  height: 40px;
+}
+.panel-filtros button:hover { background: var(--color-acento-hover); }
+
+/* ---------- Tabla de facturas ---------- */
+
+.tabla-envoltorio {
+  margin-top: 20px;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+thead th {
+  text-align: left;
+  background: #eef1f4;
+  color: var(--color-texto-suave);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-borde);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-borde);
+  white-space: nowrap;
+}
+
+tbody tr:hover { background: #f8fafb; }
+tbody tr:last-child td { border-bottom: none; }
+
+th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.fila-clic { cursor: pointer; }
+
+.boton-ver-detalle {
+  background: transparent;
+  border: 1px solid var(--color-borde);
+  color: var(--color-acento);
+  padding: 4px 8px;
+  font-size: 0.78rem;
+}
+.boton-ver-detalle:hover { background: #eef1f4; }
+
+/* ---------- Paginador ---------- */
+
+.paginador {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  color: var(--color-texto-suave);
+  font-size: 0.85rem;
+}
+
+/* ---------- Modal de detalle ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 31, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.modal-contenido {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  padding: 28px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--sombra);
+}
+
+.modal-contenido h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  color: var(--color-acento);
+}
+
+.boton-cerrar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--color-texto-suave);
+}
+.boton-cerrar:hover { color: var(--color-texto); }
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .tarjeta-login { padding: 28px 20px; }
+  .contenedor { padding: 0 12px; }
+  .panel-filtros { padding: 16px; }
+  .encabezado { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
+}
