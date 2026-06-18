@@ -6,14 +6,11 @@
   "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node src/server.js",
-    "create-admin": "node src/scripts/createUser.js"
+    "dev": "node src/server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
     "mysql2": "^3.10.0",
-    "better-sqlite3": "^11.1.2",
-    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
     "dotenv": "^16.4.5",
     "cors": "^2.8.5",
