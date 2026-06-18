@@ -54,24 +54,15 @@ router.get('/facturas', requireAuth, async (req, res) => {
       SELECT
         I.SerNr            AS numero,
         I.InvoiceType       AS tipoCodigo,
-        I.OfficialSerNr     AS numeroTimbrado,
         I.TransDate         AS fecha,
-        I.TransTime         AS hora,
         I.CustCode          AS codigoCliente,
-        C.TaxRegNr          AS ruc,
         I.CustName          AS nombreCliente,
         I.SubTotal          AS subTotal,
-        I.Total             AS total,
-        I.SalesMan          AS vendedor,
-        I.Office            AS sucursal,
-        O.Name              AS nombreSucursal
+        I.Total             AS total
       FROM Invoice I
-      LEFT JOIN Customer C ON C.Code = I.CustCode
-      LEFT JOIN Office O ON O.Code = I.Office
       WHERE I.CustCode = ?
         AND I.TransDate BETWEEN ? AND ?
-        AND (I.Invalid IS NULL OR I.Invalid = 0)
-      ORDER BY I.TransDate DESC, I.TransTime DESC, I.SerNr DESC
+      ORDER BY I.TransDate DESC, I.SerNr DESC
       LIMIT ? OFFSET ?
     `;
 
@@ -80,7 +71,6 @@ router.get('/facturas', requireAuth, async (req, res) => {
       FROM Invoice I
       WHERE I.CustCode = ?
         AND I.TransDate BETWEEN ? AND ?
-        AND (I.Invalid IS NULL OR I.Invalid = 0)
     `;
 
     const [filas] = await pool.query(sql, [
@@ -93,16 +83,16 @@ router.get('/facturas', requireAuth, async (req, res) => {
     const resultado = filas.map((f) => ({
       numero: f.numero,
       tipo: TIPO_INVOICE[f.tipoCodigo] || 'FAC',
-      numeroTimbrado: f.numeroTimbrado,
+      numeroTimbrado: null,
       fecha: f.fecha,
-      hora: f.hora,
+      hora: '',
       codigoCliente: f.codigoCliente,
-      ruc: f.ruc,
+      ruc: '',
       nombreCliente: f.nombreCliente,
       subTotal: f.subTotal,
       total: f.total,
-      vendedor: f.vendedor,
-      sucursal: f.nombreSucursal || f.sucursal,
+      vendedor: '',
+      sucursal: '',
     }));
 
     return res.json({
@@ -114,7 +104,8 @@ router.get('/facturas', requireAuth, async (req, res) => {
     });
   } catch (err) {
     console.error('Error en /api/facturas:', err.message);
-    return res.status(500).json({ error: 'Error al consultar las facturas. Intente nuevamente.' });
+    const detalle = process.env.SHOW_SQL_ERRORS === '1' ? ` Detalle: ${err.message}` : '';
+    return res.status(500).json({ error: `Error al consultar las facturas. Intente nuevamente.${detalle}` });
   }
 });
 
@@ -155,7 +146,8 @@ router.get('/facturas/:numero/detalle', requireAuth, async (req, res) => {
     return res.json({ numero, items });
   } catch (err) {
     console.error('Error en /api/facturas/:numero/detalle:', err.message);
-    return res.status(500).json({ error: 'Error al consultar el detalle de la factura.' });
+    const detalle = process.env.SHOW_SQL_ERRORS === '1' ? ` Detalle: ${err.message}` : '';
+    return res.status(500).json({ error: `Error al consultar el detalle de la factura.${detalle}` });
   }
 });
 
