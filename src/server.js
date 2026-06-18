@@ -10,6 +10,7 @@ const express = require('express');
 const cors = require('cors');
 
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
 const invoiceRoutes = require('./routes/invoices');
 const { testConnection } = require('./db/openOrangeDb');
 
@@ -33,6 +34,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api', invoiceRoutes);
 
 app.get('/api/salud', async (req, res) => {
